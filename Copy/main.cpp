@@ -1,5 +1,5 @@
 #include <iostream>
-#include <memory>
+#include <vector>
 #include "Handle.hpp"
 
 
@@ -25,10 +25,9 @@ int wmain(int argc, wchar_t** argv)
             break;
         }
 
-
         SmartHandle targetFile = ::CreateFileW(argv[2], GENERIC_WRITE, 0, nullptr,
                                                CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-        if (sourceFile == INVALID_HANDLE_VALUE)
+        if (targetFile == INVALID_HANDLE_VALUE)
         {
             std::cerr << "Failed to open the target file: 0x" << std::hex << ::GetLastError() << std::endl;
             status = -1;
@@ -37,19 +36,27 @@ int wmain(int argc, wchar_t** argv)
 
         LARGE_INTEGER li{};
         GetFileSizeEx(sourceFile, &li);
-        DWORD sourceFileSize = static_cast<DWORD>(li.QuadPart);
-        auto sourceBuf = std::unique_ptr<char[]>(new char[sourceFileSize]);
 
-        if (!ReadFile(sourceFile, sourceBuf.get(), sourceFileSize, nullptr, nullptr))
+        try
         {
-            std::cerr << "Failed to read data from the source file: 0x" << std::hex << ::GetLastError() << std::endl;
-            status = -1;
-            break;
+            std::vector<char> sourceBuf(li.QuadPart, 0);
+            if (!ReadFile(sourceFile, sourceBuf.data(), sourceBuf.size(), nullptr, nullptr))
+            {
+                std::cerr << "Failed to read data from the source file: 0x" << std::hex << ::GetLastError() << std::endl;
+                status = -1;
+                break;
+            }
+
+            if (!WriteFile(targetFile, sourceBuf.data(), sourceBuf.size(), nullptr, nullptr))
+            {
+                std::cerr << "Failed to write data into the target file: 0x" << std::hex << ::GetLastError() << std::endl;
+                status = -1;
+                break;
+            }
         }
-
-        if (!WriteFile(targetFile, sourceBuf.get(), sourceFileSize, nullptr, nullptr))
+        catch(const std::bad_alloc& ex)
         {
-            std::cerr << "Failed to write data into the target file: 0x" << std::hex << ::GetLastError() << std::endl;
+            std::cerr << ex.what() << std::endl;
             status = -1;
             break;
         }

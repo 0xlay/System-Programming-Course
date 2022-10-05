@@ -5,10 +5,10 @@
 #include <algorithm>
 
 
-namespace _internal
+namespace internal
 {
     template <typename Handle>
-    inline void CloseSmartHandle(Handle object)
+    void CloseSmartHandle(Handle object)
     {
         static_assert(false, "Type isn't supported!");
     }
@@ -84,7 +84,9 @@ template <class Handle>
 SmartHandle<Handle>::~SmartHandle() noexcept
 {
     if (object_)
-        _internal::CloseSmartHandle(object_);
+    {
+        internal::CloseSmartHandle(object_);
+    }
 }
 
 
