@@ -51,9 +51,18 @@ int main()
             return -1;
         }
 
+        try
+        {
+            handles.push_back(std::move(handle));
+        }
+        catch(const std::bad_alloc& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            return -1;
+        }
+
         std::cout << "Enter '1' if there are other players, otherwise '0': ";
         std::cin >> next;
-
         std::cin.ignore();
     }
 
