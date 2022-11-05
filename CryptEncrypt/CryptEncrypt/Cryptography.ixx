@@ -207,23 +207,6 @@ private:
     std::string     m_iv;
 };
 
-/*
-export void PasswordToKey(std::string& password)
-{
-    const EVP_MD* dgst = EVP_get_digestbyname("md5");
-    if (!dgst)
-    {
-        throw std::runtime_error("no such digest");
-    }
-
-    if (!EVP_BytesToKey(EVP_aes_128_cbc(), EVP_md5(), nullptr,
-        reinterpret_cast<std::uint8_t*>(&password[0]),
-        password.size(), 1, key, iv))
-    {
-        throw std::runtime_error("EVP_BytesToKey failed");
-    }
-}
-*/
 
 export std::string CalculateHash(std::string const& data)
 {
@@ -245,65 +228,3 @@ export std::string FetchHash(std::string& data)
     data.resize(data.size() - result.size());
     return result;
 }
-
-/*
-export void EncryptAes(std::vector<std::uint8_t> const& plainText, std::vector<std::uint8_t>& chipherText)
-{
-    EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
-    if (!EVP_EncryptInit_ex(ctx, EVP_aes_128_cbc(), nullptr, key, iv))
-    {
-        throw std::runtime_error("EncryptInit error");
-    }
-
-    std::vector<std::uint8_t> chipherTextBuf(plainText.size() + AES_BLOCK_SIZE);
-    int chipherTextSize = 0;
-    if (!EVP_EncryptUpdate(ctx, &chipherTextBuf[0], &chipherTextSize, &plainText[0], plainText.size())) 
-    {
-        EVP_CIPHER_CTX_free(ctx);
-        throw std::runtime_error("Encrypt error");
-    }
-
-    int lastPartLen = 0;
-    if (!EVP_EncryptFinal_ex(ctx, &chipherTextBuf[0] + chipherTextSize, &lastPartLen)) 
-    {
-        EVP_CIPHER_CTX_free(ctx);
-        throw std::runtime_error("EncryptFinal error");
-    }
-
-    chipherTextSize += lastPartLen;
-    chipherTextBuf.erase(chipherTextBuf.begin() + chipherTextSize, chipherTextBuf.end());
-
-    chipherText.swap(chipherTextBuf);
-
-    EVP_CIPHER_CTX_free(ctx);
-}
-
-
-export void DecryptAes(std::vector<std::uint8_t> const& chipherText, std::vector<std::uint8_t>& plainText)
-{
-    EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
-    if (!EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), nullptr, key, iv))
-    {
-        throw std::runtime_error("DecryptInit error");
-    }
-
-    std::vector<std::uint8_t> plainTextBuf(chipherText.size());
-    int plainTextSize = 0;
-    if(!EVP_DecryptUpdate(ctx, &plainTextBuf[0], &plainTextSize, &chipherText[0], chipherText.size()))
-    {
-        EVP_CIPHER_CTX_free(ctx);
-        throw std::runtime_error("Decrypt error");
-    }
-
-    int lastPartLen = 0;
-    if (!EVP_DecryptFinal_ex(ctx, &plainTextBuf[0] + plainTextSize, &lastPartLen))
-    {
-        EVP_CIPHER_CTX_free(ctx);
-        throw std::runtime_error("EncryptFinal error");
-    }
-
-    plainTextBuf.resize(plainTextSize + lastPartLen);
-    plainTextBuf.swap(plainText);
-    EVP_CIPHER_CTX_free(ctx);
-}
-*/

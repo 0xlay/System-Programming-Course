@@ -6,9 +6,6 @@ import FileAPI;
 #include <stdexcept>
 
 
-void PrintHash(std::string_view hash);
-
-
 int main()
 {
     std::string pass = "pass";
@@ -35,4 +32,3 @@ int main()
 
     return 0;
 }
-
